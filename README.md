@@ -17,6 +17,10 @@ Just go and run the script for the IP adress that you want to perform brute forc
 ```
 > Of course not to your localhost. Well depends actually if you want you are free to.
 
+Maybe you were shoulder surfing and saw someone's password or username, maybe even better you found a piece of paper in the trash with some usernames and passwords. It is also possible to have a fixed username or password or both and attack with -u and -p.
+
+![alt tag](/resources/ss1.jpg)
+
 Parameters:
     
     -IPAddr: [String, Mandatory] , throws Need IP Address Exception
@@ -48,6 +52,12 @@ Parameters:
 
     -pc: [int[], DEFAULT = 1 .. 31 ]
         List of characters that are forbidden in the password.
+        
+    -u: [String, DEFAULT = null]
+        Username. If the username is known, only the passwords will be brute forced
+
+    -p: [String, DEFAULT = null]
+        Password. If the password is known, only the usernames will be brute forced.
 
 Looking for more examples?
 ```
@@ -70,8 +80,16 @@ For gathering the < username, password > pairs, we are first starting with a one
 
 Also there can be a black list of chars which can not be used while choosing a username or a password, constraints, if these constraints are given as parameters the pairing process skips the <username, password> pairs which includes the forbidden characters. 
 
+If the username is known, only the passwords will be brute forced and if only the password is known the otherwise. If both are known but for assurance you can also try with both.
+
+![alt tag](/resources/ss2.jpg)
+
+You can reach the transcript [here](https://github.com/OykuMelikoglu/smbBruteForce/blob/master/resources/smbBrute_01.04.2018_23.24.29.txt)
 
 ## Any future work that can be done?
+
 Multi thread usage maybe? Since the brute force algorithms takes too much time, maybe decrease it a little. 
 > Still large domain, large key size usage can lead to couple of thousand years. So at the very worst, just for fun ^^
+
+Maybe also add a dictionary in the future? Because I was performing brute force attack not dictionary attack I didn't add that attack type, however why not :)
 
