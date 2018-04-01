@@ -65,6 +65,11 @@ The program creates a log that can be checked for information of the process. At
 ## How is smbBruteForce working?
 > Pure magic.
 
+If there is no info on the username or the password then all of the < username , password > tuples are send as credentials while doing smbmapping. If an smb connection is achieved, it means that the pair that is send is valid.
+For gathering the < username, password > pairs, we are first starting with a one char username, which the char is selected from the Unicode table and all of the passwords are paired and send to the smbconnection client. However since there is no limit on the password length, we need to put a limit for the character size. If not we will check one char usernames with one hundred char password prior than two char username with four char passwords. Therefore there is a limit which exceeds over time. For further info check parameter "-ml".
+
+Also there can be a black list of chars which can not be used while choosing a username or a password, constraints, if these constraints are given as parameters the pairing process skips the <username, password> pairs which includes the forbidden characters. 
+
 
 ## Any future work that can be done?
 Multi thread usage maybe? Since the brute force algorithms takes too much time, maybe decrease it a little. 
