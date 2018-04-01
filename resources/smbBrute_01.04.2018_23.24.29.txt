@@ -1,0 +1,35 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20180401232429
+Username: ...............
+RunAs User: ...............
+Configuration Name: 
+Machine: ...............
+Host Application: C:\WINDOWS\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe
+Process ID: 4732
+PSVersion: 5.1.16299.251
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.16299.251
+BuildVersion: 10.0.16299.251
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is smbBrute_01.04.2018_23.24.29.txt
+**************************************************************************
+SMB BRUTE IS WORKING ON  ...............  SELECTED PARAMS:
+LOWER BOUND FOR PASS:  33
+UPPER BOUND FOR PASS:  126
+INITIAL MAX LENGTH:  1
+MAX LENGTH INCREMENT VALUE:  1
+USERNAME CAN NOT CONTAIN:  34 47 92 91 93 58 59 124 61 44 43 42 63 60 62 37
+PASSWORD CAN NOT CONTAIN:  1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+USERNAME:  decoder
+PASSWORD:  hackme
+**************************************************************************
+SUCCESS -> User: decoder Pass: hackme
+**********************
+Windows PowerShell transcript end
+End time: 20180401232429
+**********************
